@@ -1,0 +1,81 @@
+import pandas as pd
+df=pd.read_csv("C:/Users/dhana/Downloads/winequalityN.csv")
+print(df)
+
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import LabelEncoder
+
+lr=LinearRegression()
+
+x=df.drop(["type","quality","alcohol"],axis=1)
+y = df['type']
+
+x['fixed acidity'].fillna((x['fixed acidity'].mean()),inplace=True)
+x['volatile acidity'].fillna((x['volatile acidity'].mean()),inplace=True)
+x['citric acid'].fillna((x['citric acid'].mean()), inplace=True)
+x['residual sugar'].fillna((x['residual sugar'].mean()), inplace=True)
+x['chlorides'].fillna((x['chlorides'].mean()), inplace=True)
+x['pH'].fillna((x['pH'].mean()), inplace=True)
+x['sulphates'].fillna((x['sulphates'].mean()), inplace=True)
+print(x)
+print(y)
+le=LabelEncoder()
+le.fit(y)
+y = le.transform(y)
+
+x_train,x_test,y_train,y_test=train_test_split(x,y,random_state=0,test_size=0.3)
+
+train=lr.fit(x_train,y_train)
+y_pred=lr.predict(x_test)
+print("Linear Regression:")
+print(mean_squared_error(y_test,y_pred))
+
+'''
+Output:
+
+       type  fixed acidity  volatile acidity  ...  sulphates  alcohol  quality
+0     white            7.0             0.270  ...       0.45      8.8        6
+1     white            6.3             0.300  ...       0.49      9.5        6
+2     white            8.1             0.280  ...       0.44     10.1        6
+3     white            7.2             0.230  ...       0.40      9.9        6
+4     white            7.2             0.230  ...       0.40      9.9        6
+...     ...            ...               ...  ...        ...      ...      ...
+6492    red            6.2             0.600  ...       0.58     10.5        5
+6493    red            5.9             0.550  ...        NaN     11.2        6
+6494    red            6.3             0.510  ...       0.75     11.0        6
+6495    red            5.9             0.645  ...       0.71     10.2        5
+6496    red            6.0             0.310  ...       0.66     11.0        6
+
+[6497 rows x 13 columns]
+      fixed acidity  volatile acidity  citric acid  ...  density    pH  sulphates
+0               7.0             0.270         0.36  ...  1.00100  3.00   0.450000
+1               6.3             0.300         0.34  ...  0.99400  3.30   0.490000
+2               8.1             0.280         0.40  ...  0.99510  3.26   0.440000
+3               7.2             0.230         0.32  ...  0.99560  3.19   0.400000
+4               7.2             0.230         0.32  ...  0.99560  3.19   0.400000
+...             ...               ...          ...  ...      ...   ...        ...
+6492            6.2             0.600         0.08  ...  0.99490  3.45   0.580000
+6493            5.9             0.550         0.10  ...  0.99512  3.52   0.531215
+6494            6.3             0.510         0.13  ...  0.99574  3.42   0.750000
+6495            5.9             0.645         0.12  ...  0.99547  3.57   0.710000
+6496            6.0             0.310         0.47  ...  0.99549  3.39   0.660000
+
+[6497 rows x 10 columns]
+0       white
+1       white
+2       white
+3       white
+4       white
+        ...  
+6492      red
+6493      red
+6494      red
+6495      red
+6496      red
+Name: type, Length: 6497, dtype: object
+Linear Regression:
+0.02935867256494944
+
+'''
