@@ -1,0 +1,195 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+from matplotlib import pyplot as plt
+import collections
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import mean_squared_error
+
+df = pd.read_csv('C:/Users/dhana/Downloads/Black Friday Sales/train.csv')
+
+print(df.head())
+d_c = ['User_ID', 'Product_ID', 'Gender', 'Age', 'Occupation', 'City_Category',
+       'Stay_In_Current_City_Years', 'Marital_Status', 'Product_Category_1',
+       'Product_Category_2', 'Product_Category_3', 'Purchase']
+
+df.drop(['User_ID','Product_ID'], axis=1, inplace=True)
+print(df.isnull().sum())
+print(df.isnull().mean())
+
+#Unique elements in Gender
+print('Unique elements in Gender')
+print(df['Gender'].unique())
+sns.countplot(df['Gender'])
+plt.show()
+
+c=collections.Counter(df['Gender'])
+print('The count of Each unique element')
+print(c)
+
+
+#Unique elements in Age
+print('Unique elements in Age')
+print(df['Age'].unique())
+plt.figure(figsize=(10,5))
+sns.countplot(df['Age'])
+plt.show()
+
+print('The count of Each unique element')
+print(df['Age'].value_counts())
+df['Age'].value_counts(normalize = True).plot.bar(title = 'Age')
+
+
+#Product_Category_1
+print('Unique elements in Product_Category_1')
+print(df['Product_Category_1'].unique())
+plt.figure(figsize=(10,5))
+sns.countplot(df['Product_Category_1'])
+plt.show()
+print('The count of each unique element')
+print(df['Product_Category_1'].value_counts())
+plt.figure(figsize=(10,5))
+df['Product_Category_1'].value_counts(normalize = True).plot.bar(title = 'Product_Category_1')
+
+
+df['Product_Category_3'].isnull().mean()
+df.drop(['Product_Category_3'], axis=1, inplace=True)
+
+
+df1=df.copy()
+df1.dropna(inplace=True)
+df1.isnull().mean()
+
+print(df1.dtypes)
+df1['Occupation']=df1['Occupation'].astype('object')
+df1['Occupation'].dtypes, df1['Age'].dtypes
+#print(df1.dtypes)
+
+from sklearn.preprocessing import LabelEncoder
+l=LabelEncoder()
+df1['Gender']=l.fit_transform(df1['Gender'])
+df1['Age']=l.fit_transform(df1['Age'])
+df1['Occupation']=l.fit_transform(df1['Occupation'])
+df1['City_Category']=l.fit_transform(df1['City_Category'])
+df1['Stay_In_Current_City_Years']=l.fit_transform(df1['Stay_In_Current_City_Years'])
+df1.head()
+#print(df1.head())
+
+df1['Occupation'].unique()
+df1['Product_Category_2']=df1['Product_Category_2'].astype('int64')
+df1.head(1)
+#print(df1.head(1))
+
+
+X=df1.drop(['Purchase'], axis=True)
+y=df1['Purchase']
+
+from sklearn.preprocessing import MinMaxScaler
+df_num_scl=MinMaxScaler()
+x=df_num_scl.fit_transform(X)
+x=pd.DataFrame(data=x, columns=X.columns)
+
+print(x[:1])
+X_d=x[['Product_Category_1']]
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.2)
+
+from sklearn.linear_model import LinearRegression
+lr = LinearRegression()
+model=lr.fit(X_train, y_train)
+
+print("Linear Regression:", model.score(X_test,y_test))
+
+'''
+
+Output:
+   User_ID Product_ID Gender  ... Product_Category_2  Product_Category_3 Purchase
+0  1000001  P00069042      F  ...                NaN                 NaN     8370
+1  1000001  P00248942      F  ...                6.0                14.0    15200
+2  1000001  P00087842      F  ...                NaN                 NaN     1422
+3  1000001  P00085442      F  ...               14.0                 NaN     1057
+4  1000002  P00285442      M  ...                NaN                 NaN     7969
+
+[5 rows x 12 columns]
+Gender                             0
+Age                                0
+Occupation                         0
+City_Category                      0
+Stay_In_Current_City_Years         0
+Marital_Status                     0
+Product_Category_1                 0
+Product_Category_2            173638
+Product_Category_3            383247
+Purchase                           0
+dtype: int64
+Gender                        0.000000
+Age                           0.000000
+Occupation                    0.000000
+City_Category                 0.000000
+Stay_In_Current_City_Years    0.000000
+Marital_Status                0.000000
+Product_Category_1            0.000000
+Product_Category_2            0.315666
+Product_Category_3            0.696727
+Purchase                      0.000000
+dtype: float64
+Unique elements in Gender
+['F' 'M']
+
+The count of Each unique element
+Counter({'M': 414259, 'F': 135809})
+Unique elements in Age
+['0-17' '55+' '26-35' '46-50' '51-55' '36-45' '18-25']
+
+The count of Each unique element
+26-35    219587
+36-45    110013
+18-25     99660
+46-50     45701
+51-55     38501
+55+       21504
+0-17      15102
+Name: Age, dtype: int64
+Unique elements in Product_Category_1
+[ 3  1 12  8  5  4  2  6 14 11 13 15  7 16 18 10 17  9 20 19]
+
+The count of each unique element
+5     150933
+1     140378
+8     113925
+11     24287
+2      23864
+6      20466
+3      20213
+4      11753
+16      9828
+15      6290
+13      5549
+10      5125
+12      3947
+7       3721
+18      3125
+20      2550
+19      1603
+14      1523
+17       578
+9        410
+Name: Product_Category_1, dtype: int64
+Gender                         object
+Age                            object
+Occupation                      int64
+City_Category                  object
+Stay_In_Current_City_Years     object
+Marital_Status                  int64
+Product_Category_1              int64
+Product_Category_2            float64
+Purchase                        int64
+dtype: object
+   Gender  Age  ...  Product_Category_1  Product_Category_2
+0     0.0  0.0  ...                 0.0                0.25
+
+[1 rows x 8 columns]
+Linear Regression: 0.18711591139267703
+
+'''
