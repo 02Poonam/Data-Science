@@ -1,0 +1,106 @@
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn import preprocessing
+
+df = pd.read_csv("C:/Users/dhana/Downloads/adult.csv")
+print(df)
+lg = LogisticRegression()
+print(df.info())
+
+le = preprocessing.LabelEncoder()
+
+df['workclass']= le.fit_transform(df['workclass'])
+df['education']= le.fit_transform(df['education'])
+df['marital.status']= le.fit_transform(df['marital.status'])
+df['occupation']= le.fit_transform(df['occupation'])
+df['relationship']= le.fit_transform(df['relationship'])
+df['race']= le.fit_transform(df['race'])
+df['sex']= le.fit_transform(df['sex'])
+df['native.country']= le.fit_transform(df['native.country'])
+df['income']= le.fit_transform(df['income'])
+
+x = df.drop('income',axis=1)
+y = df['income']
+print(x)
+print(y)
+
+x_train,x_test,y_train,y_test = train_test_split(x,y,random_state=0,test_size=0.2)
+
+train=lg.fit(x_train,y_train)
+y_pred=lg.predict(x_test)
+print("Logistic Regression:")
+print(accuracy_score(y_test,y_pred))
+
+'''
+Output:
+
+       age workclass  fnlwgt  ... hours.per.week  native.country income
+0       90         ?   77053  ...             40   United-States  <=50K
+1       82   Private  132870  ...             18   United-States  <=50K
+2       66         ?  186061  ...             40   United-States  <=50K
+3       54   Private  140359  ...             40   United-States  <=50K
+4       41   Private  264663  ...             40   United-States  <=50K
+...    ...       ...     ...  ...            ...             ...    ...
+32556   22   Private  310152  ...             40   United-States  <=50K
+32557   27   Private  257302  ...             38   United-States  <=50K
+32558   40   Private  154374  ...             40   United-States   >50K
+32559   58   Private  151910  ...             40   United-States  <=50K
+32560   22   Private  201490  ...             20   United-States  <=50K
+
+[32561 rows x 15 columns]
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 32561 entries, 0 to 32560
+Data columns (total 15 columns):
+ #   Column          Non-Null Count  Dtype 
+---  ------          --------------  ----- 
+ 0   age             32561 non-null  int64 
+ 1   workclass       32561 non-null  object
+ 2   fnlwgt          32561 non-null  int64 
+ 3   education       32561 non-null  object
+ 4   education.num   32561 non-null  int64 
+ 5   marital.status  32561 non-null  object
+ 6   occupation      32561 non-null  object
+ 7   relationship    32561 non-null  object
+ 8   race            32561 non-null  object
+ 9   sex             32561 non-null  object
+ 10  capital.gain    32561 non-null  int64 
+ 11  capital.loss    32561 non-null  int64 
+ 12  hours.per.week  32561 non-null  int64 
+ 13  native.country  32561 non-null  object
+ 14  income          32561 non-null  object
+dtypes: int64(6), object(9)
+memory usage: 3.7+ MB
+None
+       age  workclass  fnlwgt  ...  capital.loss  hours.per.week  native.country
+0       90          0   77053  ...          4356              40              39
+1       82          4  132870  ...          4356              18              39
+2       66          0  186061  ...          4356              40              39
+3       54          4  140359  ...          3900              40              39
+4       41          4  264663  ...          3900              40              39
+...    ...        ...     ...  ...           ...             ...             ...
+32556   22          4  310152  ...             0              40              39
+32557   27          4  257302  ...             0              38              39
+32558   40          4  154374  ...             0              40              39
+32559   58          4  151910  ...             0              40              39
+32560   22          4  201490  ...             0              20              39
+
+[32561 rows x 14 columns]
+0        0
+1        0
+2        0
+3        0
+4        0
+        ..
+32556    0
+32557    0
+32558    1
+32559    0
+32560    0
+Name: income, Length: 32561, dtype: int32
+Logistic Regression:
+0.7931828650391525
+
+'''
+
