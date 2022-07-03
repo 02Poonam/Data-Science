@@ -1,81 +1,141 @@
 import pandas as pd
-df=pd.read_csv("C:/Users/dhana/Downloads/winequalityN.csv")
-print(df)
+import seaborn as sns
+warnings.filterwarnings('ignore')
+
+df = pd.read_csv('C:/Users/dhana/Downloads/winequalityN.csv')
+print(df.head())
+print(df.describe())
+print(df.info())
+print(df.isnull().sum())
+for col, value in df.items():
+    if col != 'type':
+        df[col] = df[col].fillna(df[col].mean())
+        print(df.isnull().sum())
+
+sns.countplot(df['type'])
+
+x = df.drop(["type", "quality"], axis=1)
+y = df['quality']
+print(y.value_counts())
+
+from imblearn.over_sampling import SMOTE
+oversample = SMOTE(k_neighbors=4)
+
+x, y = oversample.fit_resample(x, y)
+print(y.value_counts())
 
 from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score
 
 lr=LinearRegression()
 
-x=df.drop(["type","quality","alcohol"],axis=1)
-y = df['type']
-
-x['fixed acidity'].fillna((x['fixed acidity'].mean()),inplace=True)
-x['volatile acidity'].fillna((x['volatile acidity'].mean()),inplace=True)
-x['citric acid'].fillna((x['citric acid'].mean()), inplace=True)
-x['residual sugar'].fillna((x['residual sugar'].mean()), inplace=True)
-x['chlorides'].fillna((x['chlorides'].mean()), inplace=True)
-x['pH'].fillna((x['pH'].mean()), inplace=True)
-x['sulphates'].fillna((x['sulphates'].mean()), inplace=True)
-print(x)
-print(y)
-le=LabelEncoder()
-le.fit(y)
-y = le.transform(y)
-
-x_train,x_test,y_train,y_test=train_test_split(x,y,random_state=0,test_size=0.3)
+x_train,x_test,y_train,y_test=train_test_split(x,y,random_state=0,test_size=0.2)
 
 train=lr.fit(x_train,y_train)
 y_pred=lr.predict(x_test)
 print("Linear Regression:")
 print(mean_squared_error(y_test,y_pred))
 
+logr=LogisticRegression()
+
+train1=logr.fit(x_train,y_train)
+y_pred1=logr.predict(x_test)
+print("Logistic Regression:")
+print(accuracy_score(y_test,y_pred1))
+
 '''
+
 Output:
+    type  fixed acidity  volatile acidity  ...  sulphates  alcohol  quality
+0  white            7.0              0.27  ...       0.45      8.8        6
+1  white            6.3              0.30  ...       0.49      9.5        6
+2  white            8.1              0.28  ...       0.44     10.1        6
+3  white            7.2              0.23  ...       0.40      9.9        6
+4  white            7.2              0.23  ...       0.40      9.9        6
 
-       type  fixed acidity  volatile acidity  ...  sulphates  alcohol  quality
-0     white            7.0             0.270  ...       0.45      8.8        6
-1     white            6.3             0.300  ...       0.49      9.5        6
-2     white            8.1             0.280  ...       0.44     10.1        6
-3     white            7.2             0.230  ...       0.40      9.9        6
-4     white            7.2             0.230  ...       0.40      9.9        6
-...     ...            ...               ...  ...        ...      ...      ...
-6492    red            6.2             0.600  ...       0.58     10.5        5
-6493    red            5.9             0.550  ...        NaN     11.2        6
-6494    red            6.3             0.510  ...       0.75     11.0        6
-6495    red            5.9             0.645  ...       0.71     10.2        5
-6496    red            6.0             0.310  ...       0.66     11.0        6
+[5 rows x 13 columns]
+       fixed acidity  volatile acidity  ...      alcohol      quality
+count    6487.000000       6489.000000  ...  6497.000000  6497.000000
+mean        7.216579          0.339691  ...    10.491801     5.818378
+std         1.296750          0.164649  ...     1.192712     0.873255
+min         3.800000          0.080000  ...     8.000000     3.000000
+25%         6.400000          0.230000  ...     9.500000     5.000000
+50%         7.000000          0.290000  ...    10.300000     6.000000
+75%         7.700000          0.400000  ...    11.300000     6.000000
+max        15.900000          1.580000  ...    14.900000     9.000000
 
-[6497 rows x 13 columns]
-      fixed acidity  volatile acidity  citric acid  ...  density    pH  sulphates
-0               7.0             0.270         0.36  ...  1.00100  3.00   0.450000
-1               6.3             0.300         0.34  ...  0.99400  3.30   0.490000
-2               8.1             0.280         0.40  ...  0.99510  3.26   0.440000
-3               7.2             0.230         0.32  ...  0.99560  3.19   0.400000
-4               7.2             0.230         0.32  ...  0.99560  3.19   0.400000
-...             ...               ...          ...  ...      ...   ...        ...
-6492            6.2             0.600         0.08  ...  0.99490  3.45   0.580000
-6493            5.9             0.550         0.10  ...  0.99512  3.52   0.531215
-6494            6.3             0.510         0.13  ...  0.99574  3.42   0.750000
-6495            5.9             0.645         0.12  ...  0.99547  3.57   0.710000
-6496            6.0             0.310         0.47  ...  0.99549  3.39   0.660000
-
-[6497 rows x 10 columns]
-0       white
-1       white
-2       white
-3       white
-4       white
-        ...  
-6492      red
-6493      red
-6494      red
-6495      red
-6496      red
-Name: type, Length: 6497, dtype: object
+[8 rows x 12 columns]
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 6497 entries, 0 to 6496
+Data columns (total 13 columns):
+ #   Column                Non-Null Count  Dtype  
+---  ------                --------------  -----  
+ 0   type                  6497 non-null   object 
+ 1   fixed acidity         6487 non-null   float64
+ 2   volatile acidity      6489 non-null   float64
+ 3   citric acid           6494 non-null   float64
+ 4   residual sugar        6495 non-null   float64
+ 5   chlorides             6495 non-null   float64
+ 6   free sulfur dioxide   6497 non-null   float64
+ 7   total sulfur dioxide  6497 non-null   float64
+ 8   density               6497 non-null   float64
+ 9   pH                    6488 non-null   float64
+ 10  sulphates             6493 non-null   float64
+ 11  alcohol               6497 non-null   float64
+ 12  quality               6497 non-null   int64  
+dtypes: float64(11), int64(1), object(1)
+memory usage: 660.0+ KB
+None
+type                     0
+fixed acidity           10
+volatile acidity         8
+citric acid              3
+residual sugar           2
+chlorides                2
+free sulfur dioxide      0
+total sulfur dioxide     0
+density                  0
+pH                       9
+sulphates                4
+alcohol                  0
+quality                  0
+dtype: int64
+type                    0
+fixed acidity           0
+volatile acidity        0
+citric acid             0
+residual sugar          0
+chlorides               0
+free sulfur dioxide     0
+total sulfur dioxide    0
+density                 0
+pH                      0
+sulphates               0
+alcohol                 0
+quality                 0
+dtype: int64
+6    2836
+5    2138
+7    1079
+4     216
+8     193
+3      30
+9       5
+Name: quality, dtype: int64
+6    2836
+5    2836
+7    2836
+8    2836
+4    2836
+3    2836
+9    2836
+Name: quality, dtype: int64
 Linear Regression:
-0.02935867256494944
+1.9738566087322953
+Logistic Regression:
+0.3084865273230924
 
 '''
