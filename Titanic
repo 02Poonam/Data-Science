@@ -11,15 +11,7 @@ from sklearn.metrics import accuracy_score
 lr=LinearRegression()
 logr=LogisticRegression()
 
-x=df.drop('PassengerId',axis=1)
-x = x.drop('Survived', axis=1)
-x = x.drop('Name',axis=1)
-x = x.drop('Ticket',axis=1)
-x = x.drop('Cabin',axis=1)
-x = x.drop('Embarked',axis=1)
-x = x.drop('Parch',axis=1)
-x = x.drop('Sex',axis=1)
-
+x=df.drop(["PassengerId","Survived","Name","Ticket","Cabin","Embarked","Parch","Sex"], axis=1)
 y = df['Survived']
 print(x)
 print(y)
